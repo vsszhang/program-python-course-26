@@ -1,0 +1,12 @@
+[project]
+name = "program-python-course-26"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[tool.uv.workspace]
+members = [
+    "src/homework_01_Sort",
+]

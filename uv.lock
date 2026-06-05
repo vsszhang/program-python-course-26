@@ -1,0 +1,19 @@
+version = 1
+revision = 3
+requires-python = ">=3.12"
+
+[manifest]
+members = [
+    "homework-01-sort",
+    "program-python-course-26",
+]
+
+[[package]]
+name = "homework-01-sort"
+version = "0.1.0"
+source = { virtual = "src/homework_01_Sort" }
+
+[[package]]
+name = "program-python-course-26"
+version = "0.1.0"
+source = { virtual = "." }

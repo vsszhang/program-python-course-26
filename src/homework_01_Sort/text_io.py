@@ -1,11 +1,7 @@
 from array import array
 from pathlib import Path
 
-from src.homework_01_Sort.binary_io import (
-    UINT32_TYPE_CODE,
-    read_uint32_chunk,
-    write_uint32_chunk,
-)
+from .binary_io import UINT32_TYPE_CODE, read_uint32_chunk, write_uint32_chunk
 
 
 def text_to_binary(

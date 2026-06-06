@@ -6,7 +6,7 @@ from multiprocessing import Pool
 from pathlib import Path
 from tempfile import TemporaryDirectory
 
-from src.homework_01_Sort.binary_io import (
+from .binary_io import (
     UINT32_SIZE,
     UINT32_TYPE_CODE,
     read_uint32_chunk,
@@ -82,11 +82,30 @@ def split_and_sort_chunks(
     return sorted(chunk_paths)
 
 
+def calculate_merge_buffer_sizes(chunk_size: int, chunk_count: int) -> tuple[int, int]:
+    """Calculate input and output buffer sizes for the merge stage.
+
+    About half of the allowed memory is uesd for input buffers, and the rest is
+    used for the output buffer. Buffer sizes are measured in numbers, not bytes.
+    """
+    if chunk_size <= 0:
+        raise ValueError("chunk_size must be a positive integer.")
+
+    if chunk_count <= 0:
+        return 1, chunk_size
+
+    input_memory_limit = max(1, chunk_size // 2)
+    input_buffer_size = max(1, input_memory_limit // chunk_count)
+    output_buffer_size = max(1, chunk_size - input_buffer_size * chunk_count)
+
+    return input_buffer_size, output_buffer_size
+
+
 def merge_sorted_chunks(
     chunk_paths: list[Path],
     output_path: Path,
-    input_buffer_size: int = 10_000,
-    output_buffer_size: int = 100_000,
+    input_buffer_size: int,
+    output_buffer_size: int,
 ) -> None:
     """Merge sorted chunk files into one sorted binary output file.
 
@@ -154,4 +173,10 @@ def external_sort(
     with TemporaryDirectory(dir=input_path.parent) as temp_dir_name:
         temp_dir = Path(temp_dir_name)
         chunk_paths = split_and_sort_chunks(input_path, chunk_size, temp_dir)
-        merge_sorted_chunks(chunk_paths, output_path)
+        input_buffer_size, output_buffer_size = calculate_merge_buffer_sizes(
+            chunk_size=chunk_size,
+            chunk_count=len(chunk_paths),
+        )
+        merge_sorted_chunks(
+            chunk_paths, output_path, input_buffer_size, output_buffer_size
+        )

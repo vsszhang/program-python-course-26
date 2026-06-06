@@ -1,9 +1,9 @@
 from argparse import ArgumentParser
 from pathlib import Path
 
-from src.homework_01_Sort.binary_io import ensure_uint32_supported
-from src.homework_01_Sort.external_sort import external_sort
-from src.homework_01_Sort.text_io import binary_to_text, text_to_binary
+from .binary_io import ensure_uint32_supported
+from .external_sort import external_sort
+from .text_io import binary_to_text, text_to_binary
 
 INPUT_BINARY_NAME = "input.bin"
 OUTPUT_BINARY_NAME = "sorted_input.bin"

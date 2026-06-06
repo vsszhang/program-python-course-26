@@ -15,7 +15,7 @@ from src.homework_01_Sort.binary_io import (
 
 
 def sort_numbers(numbers: array) -> array:
-    """Sort uint32 numbers and return a new array"""
+    """Sort uint32 numbers and return a new array."""
     return array(UINT32_TYPE_CODE, sorted(numbers))
 
 
@@ -30,7 +30,7 @@ def get_number_count(input_path: Path) -> int:
 
 
 def sort_chunk_by_index(args: tuple[Path, int, int, Path]) -> Path:
-    """Read, sort and write one chunk of the input file
+    """Read, sort and write one chunk of the input file.
 
     This function is executed inside worker processes.
     Each worker loads no more than its assigned worker chunk size into memory.
@@ -85,18 +85,30 @@ def split_and_sort_chunks(
 def merge_sorted_chunks(
     chunk_paths: list[Path],
     output_path: Path,
+    input_buffer_size: int = 10_000,
     output_buffer_size: int = 100_000,
 ) -> None:
-    """Merge sorted chunk files into one sorted binary output file."""
+    """Merge sorted chunk files into one sorted binary output file.
+
+    Each input chunk file is read by small buffers instead of reading one number
+    from disk at a time. The heap stores only the current candidate number from
+    each chunk.
+    """
     input_files = [chunk_path.open("rb") for chunk_path in chunk_paths]
+    input_buffers: list[array] = []
+    input_positions: list[int] = []
     heap: list[tuple[int, int]] = []
     output_buffer = array(UINT32_TYPE_CODE)
 
     try:
         for file_index, input_file in enumerate(input_files):
-            numbers = read_uint32_chunk(input_file, 1)
-            if len(numbers) > 0:
-                heapq.heappush(heap, (numbers[0], file_index))
+            buffer = read_uint32_chunk(input_file, input_buffer_size)
+            input_buffers.append(buffer)
+            input_positions.append(0)
+
+            if len(buffer) > 0:
+                heapq.heappush(heap, (buffer[0], file_index))
+                input_positions[file_index] = 1
 
         with output_path.open("wb") as output_file:
             while heap:
@@ -107,9 +119,17 @@ def merge_sorted_chunks(
                     write_uint32_chunk(output_file, output_buffer)
                     output_buffer = array(UINT32_TYPE_CODE)
 
-                next_numbers = read_uint32_chunk(input_files[file_index], 1)
-                if len(next_numbers) > 0:
-                    heapq.heappush(heap, (next_numbers[0], file_index))
+                if input_positions[file_index] >= len(input_buffers[file_index]):
+                    input_buffers[file_index] = read_uint32_chunk(
+                        input_files[file_index],
+                        input_buffer_size,
+                    )
+                    input_positions[file_index] = 0
+
+                if input_positions[file_index] < len(input_buffers[file_index]):
+                    next_number = input_buffers[file_index][input_positions[file_index]]
+                    input_positions[file_index] += 1
+                    heapq.heappush(heap, (next_number, file_index))
 
             if len(output_buffer) > 0:
                 write_uint32_chunk(output_file, output_buffer)
@@ -123,7 +143,7 @@ def external_sort(
     output_path: Path,
     chunk_size: int,
 ) -> None:
-    """Sort a binary uint32 file using external merge sort
+    """Sort a binary uint32 file using external merge sort.
 
     The input `chunk_size` is interpreted as the total number of values that may
     be loaded into memory at the same time during the parallel chunk-sorting stage.

@@ -11,7 +11,7 @@ members = [
 [[package]]
 name = "homework-01-sort"
 version = "0.1.0"
-source = { virtual = "src/homework_01_Sort" }
+source = { editable = "src/homework_01_Sort" }
 
 [[package]]
 name = "program-python-course-26"

@@ -50,3 +50,16 @@ def watch_create(request):
         form = WatchForm()
 
     return render(request, "catalog/watch_form.html", {"form": form})
+
+def watch_delete(request, watch_id):
+    watch = get_object_or_404(Watch, id=watch_id)
+
+    if request.method == "POST":
+        watch.delete()
+        return redirect("catalog:watch_list")
+    
+    context = {
+        "watch": watch,
+    }
+    
+    return render(request, "catalog/watch_confirm_delete.html", context)

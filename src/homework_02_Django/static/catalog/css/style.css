@@ -285,3 +285,37 @@ ul {
 .action-row {
     margin-top: 28px;
 }
+
+.danger-link,
+.danger-button {
+    display: inline-block;
+    text-decoration: none;
+    background: #dc2626;
+    color: white;
+    padding: 10px 16px;
+    border-radius: 999px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+}
+
+.danger-link:hover,
+.danger-button:hover {
+    background: #b91c1c;
+    color: white;
+}
+
+.delete-card {
+    max-width: 640px;
+    padding: 28px;
+    border-radius: 18px;
+    border: 1px solid #fecaca;
+    background: #fff7f7;
+}
+
+.delete-card form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-top: 20px;
+}

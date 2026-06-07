@@ -1,0 +1,22 @@
+{% extends "catalog/base.html" %} {% block content %}
+<h2>Watch Catalog</h2>
+
+<div>
+  {% for watch in watches %}
+  <article>
+    <h3>
+      <a href="{% url 'catalog:watch_detail' watch.id %}"> {{ watch.name }} </a>
+    </h3>
+
+    <p><strong>Brand:</strong> {{ watch.brand.name }}</p>
+    <p><strong>Category:</strong> {{ watch.category.name }}</p>
+    <p><strong>Movement:</strong> {{ watch.get_movement_type_display }}</p>
+    <p><strong>Price:</strong> {{ watch.price }}</p>
+
+    <p>{% for tag in watch.tags.all %} #{{ tag.name }} {% endfor %}</p>
+  </article>
+  {% empty %}
+  <p>No watches found.</p>
+  {% endfor %}
+</div>
+{% endblock %}

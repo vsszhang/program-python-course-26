@@ -1,0 +1,19 @@
+{% extends "catalog/base.html" %} {% block content %}
+<section>
+  <h2>Welcome to My Watch Collection</h2>
+  <p>This Django project presents a personal catalog of watches.</p>
+
+  <h3>Latest Watches</h3>
+
+  <ul>
+    {% for watch in watches %}
+    <li>
+      <a href="{% url 'catalog:watch_detail' watch.id %}"> {{ watch.name }} </a>
+      — {{ watch.brand.name }}
+    </li>
+    {% empty %}
+    <li>No watches have been added yet.</li>
+    {% endfor %}
+  </ul>
+</section>
+{% endblock %}

@@ -1,0 +1,38 @@
+{% extends "catalog/base.html" %} {% block content %}
+<article>
+  <h2>{{ watch.name }}</h2>
+
+  <p><strong>Brand:</strong> {{ watch.brand.name }}</p>
+  <p><strong>Country:</strong> {{ watch.brand.country }}</p>
+  <p><strong>Category:</strong> {{ watch.category.name }}</p>
+  <p><strong>Movement:</strong> {{ watch.get_movement_type_display }}</p>
+  <p><strong>Price:</strong> {{ watch.price }}</p>
+  <p><strong>Purchase date:</strong> {{ watch.purchase_date }}</p>
+  <p><strong>In collection:</strong> {{ watch.is_in_collection }}</p>
+
+  <h3>Description</h3>
+  <p>{{ watch.description }}</p>
+
+  <h3>Technical Details</h3>
+  <ul>
+    <li>Case size: {{ watch.watchdetail.case_size }} mm</li>
+    <li>Case material: {{ watch.watchdetail.case_material }}</li>
+    <li>Water resistance: {{ watch.watchdetail.water_resistance }} m</li>
+    <li>Lug width: {{ watch.watchdetail.lug_width }} mm</li>
+    <li>Has date: {{ watch.watchdetail.has_date }}</li>
+  </ul>
+
+  <h3>Tags</h3>
+  <ul>
+    {% for tag in watch.tags.all %}
+    <li>{{ tag.name }}</li>
+    {% empty %}
+    <li>No tags.</li>
+    {% endfor %}
+  </ul>
+
+  <p>
+    <a href="{% url 'catalog:watch_list' %}">Back to catalog</a>
+  </p>
+</article>
+{% endblock %}

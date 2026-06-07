@@ -1,38 +1,107 @@
-{% extends "catalog/base.html" %} {% block content %}
-<article>
-  <h2>{{ watch.name }}</h2>
+{% extends "catalog/base.html" %}
 
-  <p><strong>Brand:</strong> {{ watch.brand.name }}</p>
-  <p><strong>Country:</strong> {{ watch.brand.country }}</p>
-  <p><strong>Category:</strong> {{ watch.category.name }}</p>
-  <p><strong>Movement:</strong> {{ watch.get_movement_type_display }}</p>
-  <p><strong>Price:</strong> {{ watch.price }}</p>
-  <p><strong>Purchase date:</strong> {{ watch.purchase_date }}</p>
-  <p><strong>In collection:</strong> {{ watch.is_in_collection }}</p>
+{% block content %}
+<article class="detail-card">
+  <div class="detail-header">
+    <div>
+      <p class="muted">Watch Detail</p>
+      <h2>{{ watch.name }}</h2>
+      <p>{{ watch.description }}</p>
+    </div>
 
-  <h3>Description</h3>
-  <p>{{ watch.description }}</p>
+    <div class="detail-icon">⌚</div>
+  </div>
+
+  <section class="info-grid">
+    <div>
+      <span class="label">Brand</span>
+      <strong>{{ watch.brand.name }}</strong>
+    </div>
+
+    <div>
+      <span class="label">Country</span>
+      <strong>{{ watch.brand.country }}</strong>
+    </div>
+
+    <div>
+      <span class="label">Category</span>
+      <strong>{{ watch.category.name }}</strong>
+    </div>
+
+    <div>
+      <span class="label">Movement</span>
+      <strong>{{ watch.get_movement_type_display }}</strong>
+    </div>
+
+    <div>
+      <span class="label">Price</span>
+      <strong>{{ watch.price }}</strong>
+    </div>
+
+    <div>
+      <span class="label">Purchase Date</span>
+      <strong>{{ watch.purchase_date }}</strong>
+    </div>
+
+    <div>
+      <span class="label">Collection Status</span>
+      <strong>
+        {% if watch.is_in_collection %}
+          In collection
+        {% else %}
+          Archived
+        {% endif %}
+      </strong>
+    </div>
+  </section>
 
   <h3>Technical Details</h3>
-  <ul>
-    <li>Case size: {{ watch.watchdetail.case_size }} mm</li>
-    <li>Case material: {{ watch.watchdetail.case_material }}</li>
-    <li>Water resistance: {{ watch.watchdetail.water_resistance }} m</li>
-    <li>Lug width: {{ watch.watchdetail.lug_width }} mm</li>
-    <li>Has date: {{ watch.watchdetail.has_date }}</li>
-  </ul>
+
+  <section class="info-grid">
+    <div>
+      <span class="label">Case Size</span>
+      <strong>{{ watch.watchdetail.case_size }} mm</strong>
+    </div>
+
+    <div>
+      <span class="label">Case Material</span>
+      <strong>{{ watch.watchdetail.case_material }}</strong>
+    </div>
+
+    <div>
+      <span class="label">Water Resistance</span>
+      <strong>{{ watch.watchdetail.water_resistance }} m</strong>
+    </div>
+
+    <div>
+      <span class="label">Lug Width</span>
+      <strong>{{ watch.watchdetail.lug_width }} mm</strong>
+    </div>
+
+    <div>
+      <span class="label">Date Window</span>
+      <strong>
+        {% if watch.watchdetail.has_date %}
+          Yes
+        {% else %}
+          No
+        {% endif %}
+      </strong>
+    </div>
+  </section>
 
   <h3>Tags</h3>
-  <ul>
-    {% for tag in watch.tags.all %}
-    <li>{{ tag.name }}</li>
-    {% empty %}
-    <li>No tags.</li>
-    {% endfor %}
-  </ul>
 
-  <p>
-    <a href="{% url 'catalog:watch_list' %}">Back to catalog</a>
-  </p>
+  <div class="tag-list">
+    {% for tag in watch.tags.all %}
+      <span class="tag">#{{ tag.name }}</span>
+    {% empty %}
+      <span class="muted">No tags.</span>
+    {% endfor %}
+  </div>
+
+  <div class="action-row">
+    <a class="button-link" href="{% url 'catalog:watch_list' %}">Back to Catalog</a>
+  </div>
 </article>
 {% endblock %}

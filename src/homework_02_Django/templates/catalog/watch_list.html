@@ -1,19 +1,49 @@
 {% extends "catalog/base.html" %} {% block content %}
-<h2>Watch Catalog</h2>
+<div class="page-title-row">
+  <div>
+    <h2>Watch Catalog</h2>
+    <p class="muted">
+      A personal collection of daily, tool, smart and memorable watches.
+    </p>
+  </div>
 
-<div>
+  <a class="button-link" href="{% url 'catalog:watch_create' %}"
+    >Add New Watch</a
+  >
+</div>
+
+<div class="watch-grid">
   {% for watch in watches %}
-  <article>
-    <h3>
-      <a href="{% url 'catalog:watch_detail' watch.id %}"> {{ watch.name }} </a>
-    </h3>
+  <article class="watch-card">
+    <div class="watch-card-header">
+      <div class="watch-icon">⌚</div>
+      <div>
+        <h3>
+          <a href="{% url 'catalog:watch_detail' watch.id %}">
+            {{ watch.name }}
+          </a>
+        </h3>
+        <p class="muted">{{ watch.brand.name }} · {{ watch.category.name }}</p>
+      </div>
+    </div>
 
-    <p><strong>Brand:</strong> {{ watch.brand.name }}</p>
-    <p><strong>Category:</strong> {{ watch.category.name }}</p>
-    <p><strong>Movement:</strong> {{ watch.get_movement_type_display }}</p>
-    <p><strong>Price:</strong> {{ watch.price }}</p>
+    <div class="watch-meta">
+      <span>{{ watch.get_movement_type_display }}</span>
+      <span>{{ watch.price }}</span>
+      {% if watch.is_in_collection %}
+      <span>In collection</span>
+      {% else %}
+      <span>Archived</span>
+      {% endif %}
+    </div>
 
-    <p>{% for tag in watch.tags.all %} #{{ tag.name }} {% endfor %}</p>
+    <p class="watch-description">{{ watch.description|truncatewords:22 }}</p>
+
+    <div class="tag-list">
+      {% for tag in watch.tags.all %}
+      <span class="tag">#{{ tag.name }}</span>
+      {% endfor %}
+    </div>
   </article>
   {% empty %}
   <p>No watches found.</p>

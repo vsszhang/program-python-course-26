@@ -1,5 +1,6 @@
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
+from .forms import WatchForm
 from .models import Watch
 
 
@@ -37,3 +38,15 @@ def watch_detail(request, watch_id):
     }
 
     return render(request, "catalog/watch_detail.html", context)
+
+
+def watch_create(request):
+    if request.method == "POST":
+        form = WatchForm(request.POST)
+        if form.is_valid():
+            watch = form.save()
+            return redirect("catalog:watch_detail", watch_id=watch.id)
+    else:
+        form = WatchForm()
+
+    return render(request, "catalog/watch_form.html", {"form": form})

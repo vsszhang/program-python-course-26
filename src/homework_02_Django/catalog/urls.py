@@ -9,5 +9,6 @@ urlpatterns = [
     path("watches/", views.watch_list, name="watch_list"),
     path("watches/add/", views.watch_create, name="watch_create"),
     path("watches/<int:watch_id>", views.watch_detail, name="watch_detail"),
+    path("watches/<int:watch_id>/edit/", views.watch_update, name="watch_update"),
     path("watches/<int:watch_id>/delete/", views.watch_delete, name="watch_delete"),
 ]

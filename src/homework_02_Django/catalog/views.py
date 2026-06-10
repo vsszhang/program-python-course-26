@@ -49,7 +49,15 @@ def watch_create(request):
     else:
         form = WatchForm()
 
-    return render(request, "catalog/watch_form.html", {"form": form})
+    return render(
+        request,
+        "catalog/watch_form.html",
+        {
+            "form": form,
+            "title": "Add New Watch",
+            "submit_text": "Save Watch",
+        },
+    )
 
 def watch_delete(request, watch_id):
     watch = get_object_or_404(Watch, id=watch_id)
@@ -63,3 +71,25 @@ def watch_delete(request, watch_id):
     }
     
     return render(request, "catalog/watch_confirm_delete.html", context)
+
+def watch_update(request, watch_id):
+    watch = get_object_or_404(Watch, id=watch_id)
+
+    if request.method == "POST":
+        form = WatchForm(request.POST, instance=watch)
+        if form.is_valid():
+            form.save()
+            return redirect("catalog:watch_detail", watch_id=watch.id)
+    else:
+        form = WatchForm(instance=watch)
+    
+    return render(
+        request,
+        "catalog/watch_form.html",
+        {
+            "form": form,
+            "title": "Edit Watch",
+            "submit_text": "Save Changes",
+        },
+    )
+        

@@ -102,6 +102,7 @@
 
   <div class="action-row">
     <a class="button-link" href="{% url 'catalog:watch_list' %}">Back to Catalog</a>
+    <a class="button-link" href="{% url 'catalog:watch_update' watch.id %}">Edit Watch</a>
     <a class="danger-link" href="{% url 'catalog:watch_delete' watch.id %}">Delete Watch</a>
   </div>
 </article>

@@ -12,14 +12,26 @@ def home(request):
 
 
 def watch_list(request):
+    query = request.GET.get("q", "")
+
     watches = (
         Watch.objects.select_related("brand", "category")
         .prefetch_related("tags")
         .order_by("name")
     )
 
+    if query:
+        watches = watches.filter(
+            name__icontains=query
+        ) | watches.filter(
+            brand__name__icontains=query
+        ) | watches.filter(
+            category__name__icontains=query
+        )
+
     context = {
         "watches": watches,
+        "query": query
     }
 
     return render(request, "catalog/watch_list.html", context)

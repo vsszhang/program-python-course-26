@@ -319,3 +319,19 @@ ul {
     align-items: center;
     margin-top: 20px;
 }
+
+.search-form {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 28px;
+}
+
+.search-form input {
+    flex: 1;
+    max-width: 520px;
+}
+
+.search-form button {
+    border-radius: 999px;
+}

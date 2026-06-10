@@ -91,6 +91,7 @@ program-python-course-26/
 |-- README.md
 |-- pyproject.toml
 |-- uv.lock
+|-- main.py
 `-- src/
     |-- homework_01_Sort/
     `-- homework_02_Django/
@@ -98,9 +99,8 @@ program-python-course-26/
 
 ## 📝 Project Notes
 
-- The repository uses a `uv` workspace.
-- Each homework has its own package under `src/`.
+- The repository uses a `uv` workspace with two homework projects under `src/`.
 - Homework 01 focuses on file processing, binary data, multiprocessing, and
   external sorting.
 - Homework 02 focuses on Django models, views, forms, templates, static files,
-  and a small SQLite database.
+  search, create, edit, delete, and a small SQLite database.

@@ -22,6 +22,7 @@ file, and writes both `sorted_input.bin` and `sorted_input.txt`.
 
 ```text
 homework_01_Sort/
+|-- __init__.py
 |-- main.py
 |-- external_sort.py
 |-- binary_io.py
@@ -38,15 +39,16 @@ homework_01_Sort/
 
 | File | Role |
 | --- | --- |
+| `__init__.py` | Marks this directory as the `homework_01_Sort` Python package. |
 | `main.py` | Program entry point. It parses arguments and starts the full workflow. |
 | `external_sort.py` | Main sorting logic. It splits the binary file, sorts chunks in parallel, and merges chunks. |
 | `binary_io.py` | Low-level binary reading and writing for 32-bit unsigned integers. |
 | `text_io.py` | Converts between text files and binary integer files. |
 | `pyproject.toml` | Python package configuration. |
 | `random_numbers.txt` | Example text input data. |
-| `input.bin` | Generated binary input file. |
-| `sorted_input.bin` | Generated sorted binary output file. |
-| `sorted_input.txt` | Generated sorted text output file. |
+| `input.bin` | Generated binary input file after the program runs. |
+| `sorted_input.bin` | Generated sorted binary output file after the program runs. |
+| `sorted_input.txt` | Generated sorted text output file after the program runs. |
 
 ## 3. Runtime Workflow
 

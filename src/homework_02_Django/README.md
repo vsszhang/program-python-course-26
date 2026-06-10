@@ -1,23 +1,33 @@
 # Personal Watch Collection Catalog
 
-This is a Django web project for a personal watch catalog. It lets users view a watch collection, open watch details, add new watches with a web form, and delete watches after confirmation.
+This is a Django web project for a personal watch catalog. It lets users view a watch collection, search watches, open watch details, add new watches with a web form, edit existing watches, and delete watches after confirmation.
 
 ## Project Structure
 
 ```text
 homework_02_Django/
 ├── manage.py
+├── main.py
+├── pyproject.toml
 ├── db.sqlite3
 ├── watch_catalog/
+│   ├── __init__.py
 │   ├── settings.py
-│   └── urls.py
+│   ├── urls.py
+│   ├── asgi.py
+│   └── wsgi.py
 ├── catalog/
+│   ├── __init__.py
+│   ├── apps.py
 │   ├── models.py
 │   ├── forms.py
 │   ├── views.py
 │   ├── urls.py
 │   ├── admin.py
+│   ├── tests.py
 │   └── migrations/
+│       ├── __init__.py
+│       └── 0001_initial.py
 ├── templates/catalog/
 │   ├── base.html
 │   ├── home.html
@@ -38,6 +48,8 @@ Main Django parts:
 | Template | `templates/catalog/*.html` | Shows data on web pages |
 | URL | `watch_catalog/urls.py`, `catalog/urls.py` | Connects URLs to views |
 | Form | `catalog/forms.py` | Validates and saves form input |
+| Admin | `catalog/admin.py` | Registers models and custom admin list/search options |
+| Settings | `watch_catalog/settings.py` | Configures installed apps, templates, SQLite, and static files |
 | Static | `static/catalog/css/style.css` | Adds custom page styles |
 
 ## Module Flow
@@ -62,10 +74,13 @@ flowchart LR
     Home["/ Home"] --> List["/watches/ Watch list"]
     Home --> Add["/watches/add/ Add watch"]
     List --> Detail["/watches/<id> Watch detail"]
+    List --> Search["/watches/?q=... Search"]
     List --> Add
+    Detail --> Edit["/watches/<id>/edit/ Edit watch"]
     Detail --> Delete["/watches/<id>/delete/ Delete confirmation"]
     Detail --> List
     Add --> Detail
+    Edit --> Detail
     Delete --> List
     Delete --> Detail
 ```
@@ -120,21 +135,27 @@ The models also use different field types:
 | --- | --- | --- | --- |
 | `/` | `home` | `home.html` | Home page with latest watches |
 | `/watches/` | `watch_list` | `watch_list.html` | List all watches |
+| `/watches/?q=...` | `watch_list` | `watch_list.html` | Search by watch, brand, or category |
 | `/watches/<id>` | `watch_detail` | `watch_detail.html` | Show one watch in detail |
 | `/watches/add/` | `watch_create` | `watch_form.html` | Add a new watch |
+| `/watches/<id>/edit/` | `watch_update` | `watch_form.html` | Edit an existing watch |
 | `/watches/<id>/delete/` | `watch_delete` | `watch_confirm_delete.html` | Confirm and delete a watch |
 | `/admin/` | Django Admin | Built-in admin | Manage all model data |
 
 ### Form and Database
 
-The add page uses `WatchForm`, a Django `ModelForm`. The form validates input, saves valid data to SQLite, and redirects to the new watch detail page.
+The add and edit pages use `WatchForm`, a Django `ModelForm`. The form validates input, saves valid data to SQLite, and redirects to the watch detail page.
 
 The form includes custom validation:
 
 - Watch name must have at least 2 characters.
 - Price cannot be negative.
 
-### Delete Feature
+### Search, Edit, and Delete
+
+The watch list page reads the `q` query parameter and searches watch name, brand name, and category name.
+
+The edit page reuses `WatchForm` with an existing `Watch` instance. The detail page links to edit and delete actions.
 
 Delete is implemented with a confirmation page. A GET request only shows the confirmation page. The watch is deleted only after a POST request.
 
@@ -151,6 +172,8 @@ All pages use custom CSS from `static/catalog/css/style.css`. The stylesheet add
 - error message styles
 - detail information grid
 - tag styles
+- search form styles
+- delete confirmation styles
 
 ## Important Code Explanations
 
@@ -177,6 +200,7 @@ urlpatterns = [
     path("watches/", views.watch_list, name="watch_list"),
     path("watches/add/", views.watch_create, name="watch_create"),
     path("watches/<int:watch_id>", views.watch_detail, name="watch_detail"),
+    path("watches/<int:watch_id>/edit/", views.watch_update, name="watch_update"),
     path("watches/<int:watch_id>/delete/", views.watch_delete, name="watch_delete"),
 ]
 ```
@@ -221,16 +245,29 @@ This gives fixed choices for the `movement_type` field. It shows how Django can 
 
 ```python
 def watch_list(request):
+    query = request.GET.get("q", "")
+
     watches = (
         Watch.objects.select_related("brand", "category")
         .prefetch_related("tags")
         .order_by("name")
     )
 
-    return render(request, "catalog/watch_list.html", {"watches": watches})
+    if query:
+        watches = (
+            watches.filter(name__icontains=query)
+            | watches.filter(brand__name__icontains=query)
+            | watches.filter(category__name__icontains=query)
+        )
+
+    return render(
+        request,
+        "catalog/watch_list.html",
+        {"watches": watches, "query": query},
+    )
 ```
 
-This view reads watches from the database and sends them to the list template. `select_related` and `prefetch_related` reduce extra database queries.
+This view reads watches from the database, applies search when `q` is present, and sends the data to the list template. `select_related` and `prefetch_related` reduce extra database queries.
 
 ### Detail View
 
@@ -248,7 +285,7 @@ def watch_detail(request, watch_id):
 
 `get_object_or_404` returns the watch if it exists. If the ID is wrong, Django returns a 404 page.
 
-### Create View
+### Create and Update Views
 
 `catalog/views.py`
 
@@ -262,10 +299,43 @@ def watch_create(request):
     else:
         form = WatchForm()
 
-    return render(request, "catalog/watch_form.html", {"form": form})
+    return render(
+        request,
+        "catalog/watch_form.html",
+        {
+            "form": form,
+            "title": "Add New Watch",
+            "submit_text": "Save Watch",
+        },
+    )
 ```
 
-This view shows an empty form for GET requests. For POST requests, it validates the input, saves the watch, and redirects to the detail page.
+This view shows an empty form for GET requests. For POST requests, it validates the input, saves the watch, and redirects to the detail page. It also sends page title and button text to the shared form template.
+
+The edit view uses the same form with `instance=watch`:
+
+```python
+def watch_update(request, watch_id):
+    watch = get_object_or_404(Watch, id=watch_id)
+
+    if request.method == "POST":
+        form = WatchForm(request.POST, instance=watch)
+        if form.is_valid():
+            form.save()
+            return redirect("catalog:watch_detail", watch_id=watch.id)
+    else:
+        form = WatchForm(instance=watch)
+
+    return render(
+        request,
+        "catalog/watch_form.html",
+        {
+            "form": form,
+            "title": "Edit Watch",
+            "submit_text": "Save Changes",
+        },
+    )
+```
 
 ### Form Validation
 
@@ -279,15 +349,36 @@ def clean_price(self):
         raise forms.ValidationError("Price cannot be negative.")
 
     return price
+
+
+def clean_name(self):
+    name = self.cleaned_data["name"].strip()
+
+    if len(name) < 2:
+        raise forms.ValidationError(
+            "Watch name must contain at least 2 characters."
+        )
+
+    return name
 ```
 
-This is custom validation. If the user enters a negative price, Django shows an error instead of saving the data.
+These methods are custom validation. If the user enters a negative price or a too-short name, Django shows an error instead of saving the data.
 
 ### Template Data Display
 
 `templates/catalog/watch_list.html`
 
 ```django
+<form class="search-form" method="get">
+  <input
+    type="text"
+    name="q"
+    placeholder="Search by watch, brand or category..."
+    value="{{ query }}"
+  />
+  <button type="submit">Search</button>
+</form>
+
 {% for watch in watches %}
   <a href="{% url 'catalog:watch_detail' watch.id %}">
     {{ watch.name }}
@@ -299,7 +390,7 @@ This is custom validation. If the user enters a negative price, Django shows an 
 {% endfor %}
 ```
 
-The template loops through the `watches` data from the view and displays related brand and category fields.
+The template shows a search form, loops through the `watches` data from the view, and displays related brand and category fields.
 
 ### Static CSS
 
@@ -317,8 +408,9 @@ This loads the custom stylesheet for every page that extends `base.html`.
 1. The project uses a normal Django structure.
 2. The database has 5 models.
 3. The models include one-to-one, one-to-many, and many-to-many relationships.
-4. The project has home, list, detail, add, and delete pages.
-5. The add page uses a `ModelForm`.
-6. Form input is validated before saving.
-7. New data appears immediately after saving.
-8. The project uses custom CSS instead of browser default styles.
+4. The project has home, list, detail, add, edit, and delete pages.
+5. The watch list page has search.
+6. The add and edit pages use a `ModelForm`.
+7. Form input is validated before saving.
+8. New data appears immediately after saving.
+9. The project uses custom CSS instead of browser default styles.

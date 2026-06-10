@@ -403,31 +403,7 @@ O(n log n)
 
 This satisfies the homework requirement.
 
-## 9. How to Run
-
-From the repository root, run the module with `python3` and add `src` to
-`PYTHONPATH`:
-
-```bash
-PYTHONPATH=src python3 -m homework_01_Sort.main src/homework_01_Sort/random_numbers.txt 100000
-```
-
-You can also run it from the `src` directory:
-
-```bash
-cd src
-python3 -m homework_01_Sort.main homework_01_Sort/random_numbers.txt 100000
-```
-
-The program creates these files in the input file directory:
-
-```text
-input.bin
-sorted_input.bin
-sorted_input.txt
-```
-
-## 10. Important Notes
+## 9. Important Notes
 
 - Input numbers must be unsigned 32-bit integers.
 - Valid range is from `0` to `4294967295`.
@@ -437,7 +413,7 @@ sorted_input.txt
 - Temporary files are removed automatically after the sort is complete.
 - Disk space is assumed to be enough, as allowed by the homework statement.
 
-## 11. Design Summary
+## 10. Design Summary
 
 The project separates the program into small modules:
 

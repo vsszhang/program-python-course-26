@@ -312,38 +312,6 @@ The template loops through the `watches` data from the view and displays related
 
 This loads the custom stylesheet for every page that extends `base.html`.
 
-## How to Run
-
-From the repository root:
-
-```bash
-uv sync
-```
-
-Enter the Django project:
-
-```bash
-cd src/homework_02_Django
-```
-
-Run migrations:
-
-```bash
-uv run python manage.py migrate
-```
-
-Start the server:
-
-```bash
-uv run python manage.py runserver
-```
-
-Open:
-
-```text
-http://127.0.0.1:8000/
-```
-
 ## Quick Demo Points
 
 1. The project uses a normal Django structure.
